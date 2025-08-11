@@ -7,6 +7,53 @@ clear
 # Packages to install with Pacman
 PACMAN_PACKAGES="hyprland networkmanager kitty rofi playerctl tldr fish openssh brightnessctl wl-clipboard pipewire pwvucontrol wireplumber alsa-utils pipewire-alsa pipewire-pulse nvim lazygit egl-wayland yazi bluez bluez-utils ripgrep"
 
+# Dotfiles Directory
+DOTFILES_DIR="$HOME/hyprdots"
+
+# Create a backup directory for existing dotfiles
+
+BACKUP_DIR="$HOME/dotfiles_backup_$(date +%Y%m%d_%H%M%S)"
+
+
+mkdir -p "$BACKUP_DIR"
+
+
+echo "Backup directory created: $BACKUP_DIR"
+
+# Function to create symlinks
+
+create_symlink() {
+
+    local source="$1"
+
+    local target="$2"
+
+
+
+
+    if [ -e "$target" ]; then
+
+
+        echo "Backing up existing file: $target"
+
+        mv "$target" "$BACKUP_DIR/"
+
+    fi
+
+
+
+
+    echo "Creating symlink: $target -> $source"
+
+
+    ln -s "$source" "$target"
+
+
+}
+
+echo "Starting dotfiles installation..."
+
+
 # Set some colors for output messages
 OK="$(tput setaf 2)[OK]$(tput sgr0)"
 ERROR="$(tput setaf 1)[ERROR]$(tput sgr0)"
@@ -70,3 +117,23 @@ else
 fi
 
 
+for file in "$DOTFILES_DIR"/.*; do
+    # Skip the current and parent directory entries
+    if [[ "$file" == "$DOTFILES_DIR"/. || "$file" == "$DOTFILES_DIR"/.. ]]; then
+        continue
+    fi
+    # Skip .gitignore if you don't want it in your home directory
+    #
+    if [[ "$(basename "$file")" == ".gitignore" ]]; then
+        echo "Skipping .gitignore"
+        continue
+    fi
+
+    # Get the base filename
+    filename=$(basename "$file")
+    target="$HOME/$filename"
+
+    echo "Processing: $filename"  # Add this line for debugging
+    create_symlink "$file" "$target"
+done
+echo "Dotfiles installation complete!"
