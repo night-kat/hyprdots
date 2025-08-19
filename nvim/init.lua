@@ -20,6 +20,9 @@ require("lazy").setup({
   },
 }, lazy_config)
 
+-- hide mouse when typing
+vim.g.neovide_hide_mouse_when_typing = true
+
 -- load theme
 dofile(vim.g.base46_cache .. "defaults")
 dofile(vim.g.base46_cache .. "statusline")
